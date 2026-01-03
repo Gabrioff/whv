@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palomo | The Liberator's Steed</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'bolivar-dark': '#0f172a', /* Slate 900 */
+                        'bolivar-black': '#020617', /* Slate 950 */
+                        'bolivar-gold': '#d4af37', /* Metallic Gold */
+                        'bolivar-gold-light': '#f3e5ab',
+                        'bolivar-red': '#7f1d1d',
+                    },
+                    fontFamily: {
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'display': ['"Cinzel"', 'serif'],
+                        'sans': ['"Lato"', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    },
+                    animation: {
+                        'tilt': 'tilt 10s infinite linear',
+                        'shine': 'shine 2s infinite',
+                    },
+                    keyframes: {
+                        tilt: {
+                            '0%, 50%, 100%': { transform: 'rotate(0deg)' },
+                            '25%': { transform: 'rotate(0.5deg)' },
+                            '75%': { transform: 'rotate(-0.5deg)' },
+                        },
+                        shine: {
+                            '0%': { backgroundPosition: '200% center' },
+                            '100%': { backgroundPosition: '-200% center' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Animations */
+        body {
+            background-color: #020617;
+            color: #e2e8f0;
+        }
+
+        .hero-bg {
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 1)), url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center 30%;
+            background-attachment: fixed;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Smooth Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delays for children */
+        .reveal-delay-100 { transition-delay: 0.1s; }
+        .reveal-delay-200 { transition-delay: 0.2s; }
+        .reveal-delay-300 { transition-delay: 0.3s; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-bolivar-gold selection:text-bolivar-dark overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-bolivar-black/80 backdrop-blur-lg border-b border-white/5 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3 group cursor-pointer">
+                    <div class="p-2 bg-bolivar-gold/10 rounded-full group-hover:bg-bolivar-gold/20 transition-colors">
+                        <i data-lucide="horse-head" class="w-6 h-6 text-bolivar-gold"></i>
+                    </div>
+                    <span class="font-display text-xl tracking-[0.2em] text-white group-hover:text-bolivar-gold transition-colors">WHV</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-8">
+                        <a href="#home" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">HOME</a>
+                        <a href="#token" class="text-sm font-bold tracking-widest text-bolivar-gold hover:text-white transition-colors">TOKEN $WHV</a>
+                        <a href="#history" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">HISTORY</a>
+                        <a href="#traits" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">TRAITS</a>
+                        <a href="#legacy" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">LEGACY</a>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-gray-400 hover:text-white p-2">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="hidden md:hidden bg-bolivar-black border-t border-white/10" id="mobile-menu">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#home" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">HOME</a>
+                <a href="#token" class="block px-3 py-3 text-base font-bold text-bolivar-gold hover:text-white hover:bg-white/5 rounded-md">TOKEN $WHV</a>
+                <a href="#history" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">HISTORY</a>
+                <a href="#traits" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">TRAITS</a>
+                <a href="#legacy" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">LEGACY</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative h-screen flex items-center justify-center hero-bg px-4 overflow-hidden">
+        <!-- Floating Particles/Dust Effect -->
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+        
+        <div class="relative z-10 max-w-5xl mx-auto text-center reveal active">
+            <div class="inline-flex items-center gap-2 mb-6 px-4 py-1 rounded-full border border-bolivar-gold/30 bg-bolivar-gold/10 backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-bolivar-gold animate-pulse"></span>
+                <span class="text-bolivar-gold text-xs font-bold tracking-[0.2em] uppercase">The Legend of 1819</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-8xl lg:text-9xl font-display text-white font-bold mb-8 leading-tight tracking-tight">
+                THE WHITE <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-bolivar-gold via-bolivar-gold-light to-bolivar-gold text-glow">PUMP.FUN</span>
+            </h1>
+            
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-serif italic font-light leading-relaxed border-l-2 border-bolivar-gold/50 pl-6 text-left md:text-center md:border-l-0 md:pl-0">
+                "Bolívar was the mind, Palomo was the wings. Together, they rode through the Andes to carve the destiny of a continent."
+            </p>
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+                <a href="#token" class="group relative px-8 py-4 bg-bolivar-gold/10 overflow-hidden rounded-full border border-bolivar-gold/50 hover:border-bolivar-gold transition-colors duration-300 backdrop-blur-md">
+                    <span class="relative text-bolivar-gold font-display font-bold tracking-widest text-sm group-hover:text-white transition-colors">GET $WHV</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
+            <span class="text-[10px] tracking-[0.3em] uppercase text-white/60">Scroll</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 text-bolivar-gold"></i>
+        </div>
+    </section>
+
+    <!-- TOKEN SECTION (MOVED TO 2nd POSITION) -->
+    <section id="token" class="py-20 relative overflow-hidden bg-bolivar-black border-b border-white/5">
+        <!-- Subtle Dynamic Background -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-bolivar-gold/5 rounded-[100%] blur-[100px] pointer-events-none"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 relative z-10 text-center reveal">
+            
+            <!-- Elegant Title Block -->
+            <div class="mb-10">
+                <h2 class="text-5xl md:text-7xl font-display text-transparent bg-clip-text bg-gradient-to-b from-bolivar-gold to-white/80 inline-block drop-shadow-sm">
+                    $WHV
+                </h2>
+                <div class="mt-2 flex items-center justify-center gap-2 text-bolivar-gold/60">
+                    <div class="h-px w-8 bg-gradient-to-r from-transparent to-bolivar-gold"></div>
+                    <span class="font-serif italic text-sm">Precious Supply</span>
+                    <div class="h-px w-8 bg-gradient-to-l from-transparent to-bolivar-gold"></div>
+                </div>
+                <p class="text-2xl md:text-3xl font-display text-white mt-2 tracking-wider">1,819,000,000</p>
+            </div>
+
+            <!-- THE PRECIOUS CA BOX -->
+            <div class="relative group max-w-lg mx-auto mb-10 perspective-1000">
+                <!-- Animated Golden Aura/Border -->
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-bolivar-gold via-white/40 to-bolivar-gold rounded-full opacity-60 blur-md group-hover:opacity-100 group-hover:blur-lg transition duration-700 animate-tilt"></div>
+                
+                <!-- Inner Glass Bar -->
+                <div class="relative flex items-center bg-black/80 backdrop-blur-xl rounded-full border border-white/10 p-1.5 pr-2 shadow-2xl overflow-hidden">
+                    <!-- Shine Effect -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:animate-shine"></div>
+
+                    <!-- Icon -->
+                    <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-bolivar-gold to-yellow-700 text-white ml-1 shadow-inner">
+                        <i data-lucide="gem" class="w-5 h-5"></i>
+                    </div>
+                    
+                    <!-- Address Text -->
+                    <div class="flex-1 text-center px-3 overflow-hidden">
+                        <p class="font-mono text-xs sm:text-sm text-gray-300 truncate select-all group-hover:text-white transition-colors" id="ca-text">
+                            0x1819BoLiVaRPaLoMoLiBeRtAdOrFrEeDoM888
+                        </p>
+                    </div>
+
+                    <!-- Elegant Copy Button -->
+                    <button onclick="copyToClipboard()" class="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 bg-white text-bolivar-black text-xs font-bold rounded-full hover:bg-bolivar-gold transition-all duration-300 transform active:scale-95 shadow-lg z-10">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                        <span id="copy-btn-text">COPY</span>
+                    </button>
+                </div>
+                
+                <!-- Feedback Toast (Hidden by default) -->
+                <div id="copy-feedback" class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-bolivar-gold text-[10px] tracking-[0.2em] font-bold opacity-0 transition-all duration-300 transform translate-y-2">
+                    ADDRESS COPIED
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#" class="group px-6 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-bold tracking-wider text-gray-400 hover:bg-[#1DA1F2] hover:text-white hover:border-[#1DA1F2] transition-all duration-300">
+                    <i data-lucide="twitter" class="w-4 h-4"></i> TWITTER
+                </a>
+                
+                <!-- UPDATED COMMUNITY BUTTON -->
+                <a href="https://x.com/i/communities/2007403442512302332/" target="_blank" class="group px-6 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-bold tracking-wider text-gray-400 hover:bg-bolivar-gold hover:text-bolivar-black hover:border-bolivar-gold transition-all duration-300">
+                    <i data-lucide="users" class="w-4 h-4"></i> COMMUNITY
+                </a>
+                
+                <a href="#" class="group px-6 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-bold tracking-wider text-gray-400 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i> DEXSCREENER
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section id="history" class="py-24 md:py-32 relative bg-bolivar-black">
+        <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-bolivar-gold/5 to-transparent pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                
+                <!-- Text Content -->
+                <div class="reveal">
+                    <h2 class="text-bolivar-gold font-display text-lg tracking-[0.4em] mb-4 uppercase">The Origin</h2>
+                    <h3 class="text-4xl md:text-5xl font-serif text-white mb-8 leading-tight">A Gift from <br/> Destiny</h3>
+                    
+                    <div class="space-y-6 text-lg text-gray-400 font-light leading-relaxed">
+                        <p>
+                            The story begins in <strong class="text-white">Santa Rosa de Viterbo</strong>, shortly before the decisive Battle of Boyacá. A humble woman named <strong class="text-bolivar-gold">Casilda Zafra</strong> had a premonition in her dreams: she was to gift a colt to the Liberator.
+                        </p>
+                        <p>
+                            The colt was white as Andean snow, with a tail so long and lush it resembled a comet streaking through the sky. Upon seeing the beast's majestic stance, Bolívar named him <strong class="text-white">"Palomo"</strong> (The Dove).
+                        </p>
+                    </div>
+
+                    <div class="mt-10 p-6 border-l-2 border-bolivar-gold bg-white/5 backdrop-blur-sm">
+                        <i data-lucide="quote" class="w-8 h-8 text-bolivar-gold mb-4 opacity-50"></i>
+                        <p class="font-serif text-xl text-gray-200 italic">"This horse shall carry me to triumph, or we shall perish together in the attempt."</p>
+                    </div>
+                </div>
+
+                <!-- Image Composition -->
+                <div class="relative reveal reveal-delay-200 group">
+                    <div class="absolute inset-0 bg-bolivar-gold/20 transform translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-2 group-hover:translate-y-2 border border-bolivar-gold/30"></div>
+                    <div class="relative overflow-hidden aspect-[4/5] grayscale hover:grayscale-0 transition-all duration-700 ease-in-out">
+                        <img src="https://images.unsplash.com/photo-1598974357801-cbca100e65d3?q=80&w=1000&auto=format&fit=crop" alt="White Horse" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-bolivar-black via-transparent to-transparent opacity-60"></div>
+                        
+                        <div class="absolute bottom-6 left-6 right-6">
+                            <span class="block text-xs font-display tracking-widest text-bolivar-gold mb-2">ARCHIVE 1819</span>
+                            <p class="text-sm text-white/80 font-serif">Artistic representation of the Andalusian bloodline that flowed through Palomo's veins.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Characteristics Section -->
+    <section id="traits" class="py-24 bg-bolivar-dark relative border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20 reveal">
+                <h2 class="text-3xl md:text-5xl font-display text-white mb-4">Nobility & Strength</h2>
+                <div class="w-24 h-1 bg-bolivar-gold mx-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Trait 1 -->
+                <div class="group relative p-8 glass-panel hover:bg-white/10 transition-all duration-500 reveal reveal-delay-100">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+                        <i data-lucide="wind" class="w-24 h-24 text-white"></i>
+                    </div>
+                    <i data-lucide="zap" class="w-10 h-10 text-bolivar-gold mb-6"></i>
+                    <h3 class="text-xl font-display text-white mb-4 tracking-wide">Unmatched Speed</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        Described as having tireless endurance. Palomo could traverse the rugged Andean geography for days without losing his spirited gallop.
+                    </p>
+                </div>
+
+                <!-- Trait 2 -->
+                <div class="group relative p-8 glass-panel hover:bg-white/10 transition-all duration-500 reveal reveal-delay-200">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+                        <i data-lucide="crown" class="w-24 h-24 text-white"></i>
+                    </div>
+                    <i data-lucide="star" class="w-10 h-10 text-bolivar-gold mb-6"></i>
+                    <h3 class="text-xl font-display text-white mb-4 tracking-wide">Royal Presence</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        With his shimmering coat and comet-like tail, his presence on the battlefield boosted the morale of patriot troops instantly.
+                    </p>
+                </div>
+
+                <!-- Trait 3 -->
+                <div class="group relative p-8 glass-panel hover:bg-white/10 transition-all duration-500 reveal reveal-delay-300">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+                        <i data-lucide="shield" class="w-24 h-24 text-white"></i>
+                    </div>
+                    <i data-lucide="heart" class="w-10 h-10 text-bolivar-gold mb-6"></i>
+                    <h3 class="text-xl font-display text-white mb-4 tracking-wide">Loyalty</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">
+                        He served for over 10 years. It is said he could distinguish Bolívar’s voice amidst cannon fire and never flinched in combat.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline / Path to Glory -->
+    <section class="py-24 bg-bolivar-black relative overflow-hidden">
+        <!-- Background Map Effect -->
+        <div class="absolute inset-0 opacity-5 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Gran_Colombia_1820.svg/2560px-Gran_Colombia_1820.svg.png')] bg-center bg-no-repeat bg-cover grayscale"></div>
+
+        <div class="max-w-4xl mx-auto px-4 relative z-10">
+            <div class="text-center mb-16 reveal">
+                <span class="text-bolivar-gold font-mono text-sm tracking-widest uppercase">The Campaign</span>
+                <h2 class="text-4xl font-display text-white mt-2">Historic Battles</h2>
+            </div>
+
+            <div class="relative space-y-12">
+                <!-- Vertical Line -->
+                <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-bolivar-gold/50 to-transparent"></div>
+
+                <!-- Event 1 -->
+                <div class="relative md:flex items-center justify-between reveal">
+                    <div class="absolute left-4 md:left-1/2 -translate-x-[5px] w-3 h-3 bg-bolivar-black border-2 border-bolivar-gold rounded-full z-20 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
+                    
+                    <div class="ml-12 md:ml-0 md:w-5/12 md:text-right md:pr-10">
+                        <h3 class="font-display text-xl text-white">Battle of Pantano de Vargas</h3>
+                        <span class="text-xs text-bolivar-gold font-mono mb-2 block">JULY 1819</span>
+                        <p class="text-gray-400 text-sm">Where Palomo proved his worth under heavy crossfire, allowing Bolívar to command the decisive charge.</p>
+                    </div>
+                    <div class="hidden md:block md:w-5/12"></div>
+                </div>
+
+                <!-- Event 2 -->
+                <div class="relative md:flex items-center justify-between flex-row-reverse reveal reveal-delay-100">
+                    <div class="absolute left-4 md:left-1/2 -translate-x-[5px] w-3 h-3 bg-bolivar-black border-2 border-bolivar-gold rounded-full z-20 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
+                    
+                    <div class="ml-12 md:ml-0 md:w-5/12 md:pl-10">
+                        <h3 class="font-display text-xl text-white">Battle of Carabobo</h3>
+                        <span class="text-xs text-bolivar-gold font-mono mb-2 block">JUNE 1821</span>
+                        <p class="text-gray-400 text-sm">The battle that sealed Venezuela's independence. Palomo toured the victorious field carrying the Liberator.</p>
+                    </div>
+                    <div class="hidden md:block md:w-5/12"></div>
+                </div>
+
+                <!-- Event 3 -->
+                <div class="relative md:flex items-center justify-between reveal reveal-delay-200">
+                    <div class="absolute left-4 md:left-1/2 -translate-x-[5px] w-3 h-3 bg-bolivar-black border-2 border-bolivar-gold rounded-full z-20 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
+                    
+                    <div class="ml-12 md:ml-0 md:w-5/12 md:text-right md:pr-10">
+                        <h3 class="font-display text-xl text-white">Battle of Bomboná</h3>
+                        <span class="text-xs text-bolivar-gold font-mono mb-2 block">APRIL 1822</span>
+                        <p class="text-gray-400 text-sm">In the high Andes, Palomo withstood extreme weather and rugged terrain, securing the south.</p>
+                    </div>
+                    <div class="hidden md:block md:w-5/12"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Legacy -->
+    <section id="legacy" class="py-24 bg-bolivar-dark border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div class="order-2 md:order-1 reveal">
+                <div class="relative rounded-lg overflow-hidden shadow-2xl">
+                     <img src="https://images.unsplash.com/photo-1546556736-69e161042784?q=80&w=1000&auto=format&fit=crop" alt="Equestrian Statue" class="w-full h-[500px] object-cover grayscale hover:grayscale-0 transition-all duration-700 transform hover:scale-105">
+                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+                         <p class="text-white/60 text-xs text-center font-mono">EQUESTRIAN MONUMENTS ACROSS LATIN AMERICA</p>
+                     </div>
+                </div>
+            </div>
+            <div class="order-1 md:order-2 reveal reveal-delay-100">
+                <h2 class="text-4xl font-display text-white mb-6">The Last Gallop</h2>
+                <div class="space-y-6 text-lg text-gray-400 font-light leading-relaxed">
+                    <p>
+                        Palomo passed away at the <strong class="text-white">Mulaló Hacienda</strong> (current Valle del Cauca, Colombia) in 1840, ten years after his master. Locals say he died of old age and sadness, having enjoyed a retirement worthy of a hero.
+                    </p>
+                    <p>
+                        Today, his horseshoes and other relics are preserved in the <strong class="text-white">Mulaló Museum</strong>, revered as sacred relics of the independence crusade.
+                    </p>
+                </div>
+                
+                <div class="mt-8 p-6 border border-bolivar-gold/20 bg-bolivar-gold/5 rounded-lg">
+                    <p class="text-bolivar-gold text-center font-serif italic text-lg">
+                        "In the history of the Americas, there is no rider without a horse, nor Bolívar without Palomo."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-bolivar-black text-white py-16 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
+                <div class="md:col-span-2">
+                    <div class="flex items-center justify-center md:justify-start gap-2 mb-6">
+                        <i data-lucide="feather" class="text-bolivar-gold w-6 h-6"></i>
+                        <span class="font-display text-2xl tracking-widest">LIVING HISTORY</span>
+                    </div>
+                    <p class="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto md:mx-0">
+                        Dedicated to the memory of the silent heroes of independence. This is a tribute to the bond between man and beast that shaped a continent.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-6 tracking-widest text-sm">NAVIGATION</h4>
+                    <ul class="space-y-4 text-sm text-gray-500">
+                        <li><a href="#home" class="hover:text-bolivar-gold transition-colors">Home</a></li>
+                        <li><a href="#token" class="hover:text-bolivar-gold transition-colors">Token ($WHV)</a></li>
+                        <li><a href="#history" class="hover:text-bolivar-gold transition-colors">History</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-6 tracking-widest text-sm">SOCIALS</h4>
+                    <div class="flex justify-center md:justify-start gap-4">
+                        <a href="https://x.com/i/communities/2007403442512302332/" target="_blank" class="text-gray-500 hover:text-bolivar-gold transition-colors"><i data-lucide="users" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-gray-500 hover:text-bolivar-gold transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-gray-500 hover:text-bolivar-gold transition-colors"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/5 mt-16 pt-8 text-center">
+                <p class="text-xs text-gray-600 font-sans tracking-widest">
+                    &copy; 2024 HISTORICAL MEMORY PROJECT. ALL RIGHTS RESERVED.
+                </p>
+                <p class="text-[10px] text-gray-700 mt-2">
+                    $WHV IS A MEMECOIN FOR ENTERTAINMENT PURPOSES. NOT FINANCIAL ADVICE.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Advanced Reveal on Scroll
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 100;
+
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        // Trigger once on load
+        revealOnScroll();
+
+        // Navbar Blur Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-bolivar-black/95');
+                navbar.classList.add('shadow-xl');
+            } else {
+                navbar.classList.remove('bg-bolivar-black/95');
+                navbar.classList.remove('shadow-xl');
+            }
+        });
+
+        // Copy to Clipboard Logic
+        function copyToClipboard() {
+            const caText = document.getElementById('ca-text').innerText.trim();
+            const btnText = document.getElementById('copy-btn-text');
+            const feedback = document.getElementById('copy-feedback');
+            
+            navigator.clipboard.writeText(caText).then(() => {
+                const originalText = btnText.innerText;
+                btnText.innerText = "COPIED";
+                
+                // Show feedback toast
+                feedback.classList.remove('opacity-0', 'translate-y-2');
+                feedback.classList.add('opacity-100', 'translate-y-0');
+                
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    feedback.classList.remove('opacity-100', 'translate-y-0');
+                    feedback.classList.add('opacity-0', 'translate-y-2');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

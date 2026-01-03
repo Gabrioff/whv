@@ -40,6 +40,8 @@
                     animation: {
                         'tilt': 'tilt 10s infinite linear',
                         'shine': 'shine 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'ken-burns': 'kenBurns 20s ease-in-out infinite alternate',
                     },
                     keyframes: {
                         tilt: {
@@ -50,6 +52,14 @@
                         shine: {
                             '0%': { backgroundPosition: '200% center' },
                             '100%': { backgroundPosition: '-200% center' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        kenBurns: {
+                            '0%': { transform: 'scale(1) translate(0, 0)' },
+                            '100%': { transform: 'scale(1.1) translate(-2%, -1%)' }
                         }
                     }
                 }
@@ -62,65 +72,118 @@
         body {
             background-color: #020617;
             color: #e2e8f0;
+            overflow-x: hidden;
+            perspective: 1000px;
         }
 
-        .hero-bg {
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 1)), url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?q=80&w=1920&auto=format&fit=crop');
+        /* CINEMATIC BACKGROUND LAYER */
+        .cinematic-bg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .cinematic-bg-image {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
             background-position: center 30%;
-            background-attachment: fixed;
+            /* The Ken Burns Animation is applied via Tailwind class animate-ken-burns */
+        }
+
+        /* Overlay to darken image for text readability */
+        .cinematic-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 1));
+            z-index: 1;
         }
 
         .text-glow {
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
 
-        /* Smooth Reveal Animation */
-        .reveal {
+        /* 3D SCROLL REVEAL EFFECT */
+        .reveal-3d {
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+            transform: perspective(1000px) translate3d(0, 100px, -50px) rotateX(25deg);
+            transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform, opacity;
+            transform-style: preserve-3d;
         }
         
-        .reveal.active {
+        .reveal-3d.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: perspective(1000px) translate3d(0, 0, 0) rotateX(0deg);
         }
 
         /* Staggered delays for children */
-        .reveal-delay-100 { transition-delay: 0.1s; }
-        .reveal-delay-200 { transition-delay: 0.2s; }
-        .reveal-delay-300 { transition-delay: 0.3s; }
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
 
         /* Glassmorphism */
         .glass-panel {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+        
+        .glass-panel:hover {
+            transform: translateZ(20px) scale(1.02);
+        }
+
+        /* 3D Text Tilt Effect Wrapper */
+        .tilt-wrapper {
+            transform-style: preserve-3d;
+        }
+        
+        .tilt-element {
+            transform: translateZ(20px);
+        }
+
+        /* Canvas for Particles */
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2; /* Above background image, below content */
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="antialiased selection:bg-bolivar-gold selection:text-bolivar-dark overflow-x-hidden">
+<body class="antialiased selection:bg-bolivar-gold selection:text-bolivar-dark">
 
     <!-- Navbar -->
     <nav class="fixed w-full z-50 bg-bolivar-black/80 backdrop-blur-lg border-b border-white/5 transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <div class="flex items-center space-x-3 group cursor-pointer">
+                <div class="flex items-center space-x-3 group cursor-pointer hover:scale-105 transition-transform duration-300">
                     <div class="p-2 bg-bolivar-gold/10 rounded-full group-hover:bg-bolivar-gold/20 transition-colors">
                         <i data-lucide="horse-head" class="w-6 h-6 text-bolivar-gold"></i>
                     </div>
-                    <span class="font-display text-xl tracking-[0.2em] text-white group-hover:text-bolivar-gold transition-colors">VWH</span>
+                    <!-- CHANGED: VWH -> LWH -->
+                    <span class="font-display text-xl tracking-[0.2em] text-white group-hover:text-bolivar-gold transition-colors">LWH</span>
                 </div>
                 
                 <!-- Desktop Menu -->
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-center space-x-8">
-                        <a href="#home" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">HOME</a>
-                        <a href="#token" class="text-sm font-bold tracking-widest text-bolivar-gold hover:text-white transition-colors">TOKEN $VWH</a>
-                        <a href="#history" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">HISTORY</a>
-                        <a href="#traits" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">TRAITS</a>
-                        <a href="#legacy" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors">LEGACY</a>
+                        <a href="#home" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors hover:-translate-y-0.5 transform duration-200">HOME</a>
+                        <!-- CHANGED: $VWH -> $LWH -->
+                        <a href="#token" class="text-sm font-bold tracking-widest text-bolivar-gold hover:text-white transition-colors hover:-translate-y-0.5 transform duration-200">TOKEN $LWH</a>
+                        <a href="#history" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors hover:-translate-y-0.5 transform duration-200">HISTORY</a>
+                        <a href="#traits" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors hover:-translate-y-0.5 transform duration-200">TRAITS</a>
+                        <a href="#legacy" class="text-sm font-medium tracking-widest text-gray-400 hover:text-white transition-colors hover:-translate-y-0.5 transform duration-200">LEGACY</a>
                     </div>
                 </div>
 
@@ -136,7 +199,8 @@
         <div class="hidden md:hidden bg-bolivar-black border-t border-white/10" id="mobile-menu">
             <div class="px-4 pt-2 pb-6 space-y-2">
                 <a href="#home" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">HOME</a>
-                <a href="#token" class="block px-3 py-3 text-base font-bold text-bolivar-gold hover:text-white hover:bg-white/5 rounded-md">TOKEN $VWH</a>
+                <!-- CHANGED: $VWH -> $LWH -->
+                <a href="#token" class="block px-3 py-3 text-base font-bold text-bolivar-gold hover:text-white hover:bg-white/5 rounded-md">TOKEN $LWH</a>
                 <a href="#history" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">HISTORY</a>
                 <a href="#traits" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">TRAITS</a>
                 <a href="#legacy" class="block px-3 py-3 text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-md">LEGACY</a>
@@ -144,62 +208,73 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="relative h-screen flex items-center justify-center hero-bg px-4 overflow-hidden">
-        <!-- Floating Particles/Dust Effect -->
-        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+    <!-- Hero Section with "Video Feel" -->
+    <section id="home" class="relative h-screen flex items-center justify-center px-4 overflow-hidden perspective-container" onmousemove="handleHeroTilt(event)">
         
-        <div class="relative z-10 max-w-5xl mx-auto text-center reveal active">
-            <div class="inline-flex items-center gap-2 mb-6 px-4 py-1 rounded-full border border-bolivar-gold/30 bg-bolivar-gold/10 backdrop-blur-sm">
+        <!-- 1. Cinematic Background Layer (Ken Burns Effect) -->
+        <div class="cinematic-bg-container">
+            <div class="cinematic-bg-image animate-ken-burns"></div>
+            <div class="cinematic-overlay"></div>
+        </div>
+
+        <!-- 2. Dynamic Particles Layer (Canvas) -->
+        <canvas id="particles-canvas"></canvas>
+        
+        <!-- Content Layer -->
+        <div id="hero-content" class="relative z-10 max-w-5xl mx-auto text-center tilt-wrapper transition-transform duration-100 ease-out">
+            <div class="inline-flex items-center gap-2 mb-6 px-4 py-1 rounded-full border border-bolivar-gold/30 bg-bolivar-gold/10 backdrop-blur-sm tilt-element">
                 <span class="w-2 h-2 rounded-full bg-bolivar-gold animate-pulse"></span>
                 <span class="text-bolivar-gold text-xs font-bold tracking-[0.2em] uppercase">The Legend of 1819</span>
             </div>
             
-            <h1 class="text-4xl md:text-7xl lg:text-8xl font-display text-white font-bold mb-2 leading-tight tracking-tight">
-                VENEZUELAN <br/>
+            <!-- CHANGED: VENEZUELAN -> LIBERTY -->
+            <h1 class="text-4xl md:text-7xl lg:text-8xl font-display text-white font-bold mb-2 leading-tight tracking-tight tilt-element" style="transform: translateZ(40px)">
+                LIBERTY <br/>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-bolivar-gold via-bolivar-gold-light to-bolivar-gold text-glow">WHITE HORSE</span>
             </h1>
             
-            <p class="text-xl md:text-3xl font-display text-bolivar-gold/80 font-bold tracking-[0.3em] mb-10 uppercase">
+            <p class="text-xl md:text-3xl font-display text-bolivar-gold/80 font-bold tracking-[0.3em] mb-10 uppercase tilt-element" style="transform: translateZ(30px)">
                 ON PUMP.FUN
             </p>
             
-            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-serif italic font-light leading-relaxed border-l-2 border-bolivar-gold/50 pl-6 text-left md:text-center md:border-l-0 md:pl-0">
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 font-serif italic font-light leading-relaxed border-l-2 border-bolivar-gold/50 pl-6 text-left md:text-center md:border-l-0 md:pl-0 tilt-element">
                 "Bolívar was the mind, Palomo was the wings. Together, they rode through the Andes to carve the destiny of a continent."
             </p>
             
-            <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
-                <a href="#token" class="group relative px-8 py-4 bg-bolivar-gold/10 overflow-hidden rounded-full border border-bolivar-gold/50 hover:border-bolivar-gold transition-colors duration-300 backdrop-blur-md">
-                    <span class="relative text-bolivar-gold font-display font-bold tracking-widest text-sm group-hover:text-white transition-colors">GET $VWH</span>
+            <div class="flex flex-col md:flex-row gap-6 justify-center items-center tilt-element">
+                <!-- CHANGED: GET $VWH -> GET $LWH -->
+                <a href="#token" class="group relative px-8 py-4 bg-bolivar-gold/10 overflow-hidden rounded-full border border-bolivar-gold/50 hover:border-bolivar-gold transition-colors duration-300 backdrop-blur-md hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]">
+                    <span class="relative text-bolivar-gold font-display font-bold tracking-widest text-sm group-hover:text-white transition-colors">GET $LWH</span>
                 </a>
             </div>
         </div>
         
         <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce pointer-events-none z-20">
             <span class="text-[10px] tracking-[0.3em] uppercase text-white/60">Scroll</span>
             <i data-lucide="chevron-down" class="w-5 h-5 text-bolivar-gold"></i>
         </div>
     </section>
 
-    <!-- TOKEN SECTION (MOVED TO 2nd POSITION) -->
+    <!-- TOKEN SECTION -->
     <section id="token" class="py-20 relative overflow-hidden bg-bolivar-black border-b border-white/5">
         <!-- Subtle Dynamic Background -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-bolivar-gold/5 rounded-[100%] blur-[100px] pointer-events-none"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-bolivar-gold/5 rounded-[100%] blur-[100px] pointer-events-none animate-pulse"></div>
         
-        <div class="max-w-4xl mx-auto px-4 relative z-10 text-center reveal">
+        <div class="max-w-4xl mx-auto px-4 relative z-10 text-center reveal-3d">
             
             <!-- Elegant Title Block -->
             <div class="mb-10">
+                <!-- CHANGED: $VWH -> $LWH -->
                 <h2 class="text-5xl md:text-7xl font-display text-transparent bg-clip-text bg-gradient-to-b from-bolivar-gold to-white/80 inline-block drop-shadow-sm">
-                    $VWH
+                    $LWH
                 </h2>
                 <div class="mt-2 flex items-center justify-center gap-2 text-bolivar-gold/60">
                     <div class="h-px w-8 bg-gradient-to-r from-transparent to-bolivar-gold"></div>
                     <span class="font-serif italic text-sm">Precious Supply</span>
                     <div class="h-px w-8 bg-gradient-to-l from-transparent to-bolivar-gold"></div>
                 </div>
-                <p class="text-2xl md:text-3xl font-display text-white mt-2 tracking-wider">1,000,000,000</p>
+                <p class="text-2xl md:text-3xl font-display text-white mt-2 tracking-wider animate-float">1,000,000,000</p>
             </div>
 
             <!-- THE PRECIOUS CA BOX -->
@@ -208,7 +283,7 @@
                 <div class="absolute -inset-0.5 bg-gradient-to-r from-bolivar-gold via-white/40 to-bolivar-gold rounded-full opacity-60 blur-md group-hover:opacity-100 group-hover:blur-lg transition duration-700 animate-tilt"></div>
                 
                 <!-- Inner Glass Bar -->
-                <div class="relative flex items-center bg-black/80 backdrop-blur-xl rounded-full border border-white/10 p-1.5 pr-2 shadow-2xl overflow-hidden">
+                <div class="relative flex items-center bg-black/80 backdrop-blur-xl rounded-full border border-white/10 p-1.5 pr-2 shadow-2xl overflow-hidden transform group-hover:scale-[1.02] transition-transform duration-300">
                     <!-- Shine Effect -->
                     <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:animate-shine"></div>
 
@@ -240,12 +315,12 @@
             <!-- Action Buttons -->
             <div class="flex flex-wrap justify-center gap-4">
                 
-                <!-- UPDATED COMMUNITY BUTTON -->
-                <a href="https://x.com/i/communities/2007408388045459474" target="_blank" class="group px-6 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-bold tracking-wider text-gray-400 hover:bg-bolivar-gold hover:text-bolivar-black hover:border-bolivar-gold transition-all duration-300">
-                    <i data-lucide="users" class="w-4 h-4"></i> COMMUNITY
+                <!-- CHANGED: COMMUNITY -> TWITTER, New Link -->
+                <a href="https://x.com/LWHonSolana" target="_blank" class="group px-6 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-bold tracking-wider text-gray-400 hover:bg-bolivar-gold hover:text-bolivar-black hover:border-bolivar-gold transition-all duration-300 hover:-translate-y-1">
+                    <i data-lucide="twitter" class="w-4 h-4"></i> TWITTER
                 </a>
                 
-                <a href="#" class="group px-6 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-bold tracking-wider text-gray-400 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300">
+                <a href="#" class="group px-6 py-2 rounded-full bg-white/5 border border-white/10 flex items-center gap-2 text-xs font-bold tracking-wider text-gray-400 hover:bg-green-500 hover:text-white hover:border-green-500 transition-all duration-300 hover:-translate-y-1">
                     <i data-lucide="bar-chart-2" class="w-4 h-4"></i> DEXSCREENER
                 </a>
             </div>
@@ -260,7 +335,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                 
                 <!-- Text Content -->
-                <div class="reveal">
+                <div class="reveal-3d">
                     <h2 class="text-bolivar-gold font-display text-lg tracking-[0.4em] mb-4 uppercase">The Origin</h2>
                     <h3 class="text-4xl md:text-5xl font-serif text-white mb-8 leading-tight">A Gift from <br/> Destiny</h3>
                     
@@ -273,20 +348,20 @@
                         </p>
                     </div>
 
-                    <div class="mt-10 p-6 border-l-2 border-bolivar-gold bg-white/5 backdrop-blur-sm">
+                    <div class="mt-10 p-6 border-l-2 border-bolivar-gold bg-white/5 backdrop-blur-sm transform hover:translate-x-2 transition-transform duration-300">
                         <i data-lucide="quote" class="w-8 h-8 text-bolivar-gold mb-4 opacity-50"></i>
                         <p class="font-serif text-xl text-gray-200 italic">"This horse shall carry me to triumph, or we shall perish together in the attempt."</p>
                     </div>
                 </div>
 
                 <!-- Image Composition -->
-                <div class="relative reveal reveal-delay-200 group">
-                    <div class="absolute inset-0 bg-bolivar-gold/20 transform translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-2 group-hover:translate-y-2 border border-bolivar-gold/30"></div>
-                    <div class="relative overflow-hidden aspect-[4/5] grayscale hover:grayscale-0 transition-all duration-700 ease-in-out">
+                <div class="relative reveal-3d delay-200 group perspective-1000">
+                    <div class="absolute inset-0 bg-bolivar-gold/20 transform translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-6 group-hover:translate-y-6 border border-bolivar-gold/30"></div>
+                    <div class="relative overflow-hidden aspect-[4/5] grayscale hover:grayscale-0 transition-all duration-700 ease-in-out shadow-2xl group-hover:rotate-y-6 transform-style-3d">
                         <img src="https://images.unsplash.com/photo-1598974357801-cbca100e65d3?q=80&w=1000&auto=format&fit=crop" alt="White Horse" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-bolivar-black via-transparent to-transparent opacity-60"></div>
                         
-                        <div class="absolute bottom-6 left-6 right-6">
+                        <div class="absolute bottom-6 left-6 right-6 transform translate-z-20">
                             <span class="block text-xs font-display tracking-widest text-bolivar-gold mb-2">ARCHIVE 1819</span>
                             <p class="text-sm text-white/80 font-serif">Artistic representation of the Andalusian bloodline that flowed through Palomo's veins.</p>
                         </div>
@@ -299,44 +374,44 @@
     <!-- Characteristics Section -->
     <section id="traits" class="py-24 bg-bolivar-dark relative border-y border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-20 reveal">
+            <div class="text-center mb-20 reveal-3d">
                 <h2 class="text-3xl md:text-5xl font-display text-white mb-4">Nobility & Strength</h2>
                 <div class="w-24 h-1 bg-bolivar-gold mx-auto"></div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Trait 1 -->
-                <div class="group relative p-8 glass-panel hover:bg-white/10 transition-all duration-500 reveal reveal-delay-100">
+                <div class="group relative p-8 glass-panel hover:bg-white/10 reveal-3d delay-100">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
                         <i data-lucide="wind" class="w-24 h-24 text-white"></i>
                     </div>
-                    <i data-lucide="zap" class="w-10 h-10 text-bolivar-gold mb-6"></i>
+                    <i data-lucide="zap" class="w-10 h-10 text-bolivar-gold mb-6 group-hover:scale-110 transition-transform"></i>
                     <h3 class="text-xl font-display text-white mb-4 tracking-wide">Unmatched Speed</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">
+                    <p class="text-gray-400 leading-relaxed text-sm group-hover:text-white transition-colors">
                         Described as having tireless endurance. Palomo could traverse the rugged Andean geography for days without losing his spirited gallop.
                     </p>
                 </div>
 
                 <!-- Trait 2 -->
-                <div class="group relative p-8 glass-panel hover:bg-white/10 transition-all duration-500 reveal reveal-delay-200">
+                <div class="group relative p-8 glass-panel hover:bg-white/10 reveal-3d delay-200">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
                         <i data-lucide="crown" class="w-24 h-24 text-white"></i>
                     </div>
-                    <i data-lucide="star" class="w-10 h-10 text-bolivar-gold mb-6"></i>
+                    <i data-lucide="star" class="w-10 h-10 text-bolivar-gold mb-6 group-hover:scale-110 transition-transform"></i>
                     <h3 class="text-xl font-display text-white mb-4 tracking-wide">Royal Presence</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">
+                    <p class="text-gray-400 leading-relaxed text-sm group-hover:text-white transition-colors">
                         With his shimmering coat and comet-like tail, his presence on the battlefield boosted the morale of patriot troops instantly.
                     </p>
                 </div>
 
                 <!-- Trait 3 -->
-                <div class="group relative p-8 glass-panel hover:bg-white/10 transition-all duration-500 reveal reveal-delay-300">
+                <div class="group relative p-8 glass-panel hover:bg-white/10 reveal-3d delay-300">
                     <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
                         <i data-lucide="shield" class="w-24 h-24 text-white"></i>
                     </div>
-                    <i data-lucide="heart" class="w-10 h-10 text-bolivar-gold mb-6"></i>
+                    <i data-lucide="heart" class="w-10 h-10 text-bolivar-gold mb-6 group-hover:scale-110 transition-transform"></i>
                     <h3 class="text-xl font-display text-white mb-4 tracking-wide">Loyalty</h3>
-                    <p class="text-gray-400 leading-relaxed text-sm">
+                    <p class="text-gray-400 leading-relaxed text-sm group-hover:text-white transition-colors">
                         He served for over 10 years. It is said he could distinguish Bolívar’s voice amidst cannon fire and never flinched in combat.
                     </p>
                 </div>
@@ -350,7 +425,7 @@
         <div class="absolute inset-0 opacity-5 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Gran_Colombia_1820.svg/2560px-Gran_Colombia_1820.svg.png')] bg-center bg-no-repeat bg-cover grayscale"></div>
 
         <div class="max-w-4xl mx-auto px-4 relative z-10">
-            <div class="text-center mb-16 reveal">
+            <div class="text-center mb-16 reveal-3d">
                 <span class="text-bolivar-gold font-mono text-sm tracking-widest uppercase">The Campaign</span>
                 <h2 class="text-4xl font-display text-white mt-2">Historic Battles</h2>
             </div>
@@ -360,7 +435,7 @@
                 <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-bolivar-gold/50 to-transparent"></div>
 
                 <!-- Event 1 -->
-                <div class="relative md:flex items-center justify-between reveal">
+                <div class="relative md:flex items-center justify-between reveal-3d">
                     <div class="absolute left-4 md:left-1/2 -translate-x-[5px] w-3 h-3 bg-bolivar-black border-2 border-bolivar-gold rounded-full z-20 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
                     
                     <div class="ml-12 md:ml-0 md:w-5/12 md:text-right md:pr-10">
@@ -372,7 +447,7 @@
                 </div>
 
                 <!-- Event 2 -->
-                <div class="relative md:flex items-center justify-between flex-row-reverse reveal reveal-delay-100">
+                <div class="relative md:flex items-center justify-between flex-row-reverse reveal-3d delay-100">
                     <div class="absolute left-4 md:left-1/2 -translate-x-[5px] w-3 h-3 bg-bolivar-black border-2 border-bolivar-gold rounded-full z-20 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
                     
                     <div class="ml-12 md:ml-0 md:w-5/12 md:pl-10">
@@ -384,7 +459,7 @@
                 </div>
 
                 <!-- Event 3 -->
-                <div class="relative md:flex items-center justify-between reveal reveal-delay-200">
+                <div class="relative md:flex items-center justify-between reveal-3d delay-200">
                     <div class="absolute left-4 md:left-1/2 -translate-x-[5px] w-3 h-3 bg-bolivar-black border-2 border-bolivar-gold rounded-full z-20 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
                     
                     <div class="ml-12 md:ml-0 md:w-5/12 md:text-right md:pr-10">
@@ -401,15 +476,16 @@
     <!-- Legacy -->
     <section id="legacy" class="py-24 bg-bolivar-dark border-t border-white/5">
         <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div class="order-2 md:order-1 reveal">
-                <div class="relative rounded-lg overflow-hidden shadow-2xl">
-                     <img src="https://images.unsplash.com/photo-1546556736-69e161042784?q=80&w=1000&auto=format&fit=crop" alt="Equestrian Statue" class="w-full h-[500px] object-cover grayscale hover:grayscale-0 transition-all duration-700 transform hover:scale-105">
-                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+            <div class="order-2 md:order-1 reveal-3d">
+                <div class="relative rounded-lg overflow-hidden shadow-2xl group">
+                     <div class="absolute inset-0 bg-bolivar-gold/0 group-hover:bg-bolivar-gold/10 transition-colors duration-500 z-10"></div>
+                     <img src="https://images.unsplash.com/photo-1546556736-69e161042784?q=80&w=1000&auto=format&fit=crop" alt="Equestrian Statue" class="w-full h-[500px] object-cover grayscale hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105">
+                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6 z-20">
                          <p class="text-white/60 text-xs text-center font-mono">EQUESTRIAN MONUMENTS ACROSS LATIN AMERICA</p>
                      </div>
                 </div>
             </div>
-            <div class="order-1 md:order-2 reveal reveal-delay-100">
+            <div class="order-1 md:order-2 reveal-3d delay-100">
                 <h2 class="text-4xl font-display text-white mb-6">The Last Gallop</h2>
                 <div class="space-y-6 text-lg text-gray-400 font-light leading-relaxed">
                     <p>
@@ -420,7 +496,7 @@
                     </p>
                 </div>
                 
-                <div class="mt-8 p-6 border border-bolivar-gold/20 bg-bolivar-gold/5 rounded-lg">
+                <div class="mt-8 p-6 border border-bolivar-gold/20 bg-bolivar-gold/5 rounded-lg hover:border-bolivar-gold/40 transition-colors">
                     <p class="text-bolivar-gold text-center font-serif italic text-lg">
                         "In the history of the Americas, there is no rider without a horse, nor Bolívar without Palomo."
                     </p>
@@ -446,16 +522,17 @@
                     <h4 class="font-bold text-white mb-6 tracking-widest text-sm">NAVIGATION</h4>
                     <ul class="space-y-4 text-sm text-gray-500">
                         <li><a href="#home" class="hover:text-bolivar-gold transition-colors">Home</a></li>
-                        <li><a href="#token" class="hover:text-bolivar-gold transition-colors">Token ($VWH)</a></li>
+                        <!-- CHANGED: $VWH -> $LWH -->
+                        <li><a href="#token" class="hover:text-bolivar-gold transition-colors">Token ($LWH)</a></li>
                         <li><a href="#history" class="hover:text-bolivar-gold transition-colors">History</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-bold text-white mb-6 tracking-widest text-sm">SOCIALS</h4>
                     <div class="flex justify-center md:justify-start gap-4">
-                        <a href="https://x.com/i/communities/2007408388045459474" target="_blank" class="text-gray-500 hover:text-bolivar-gold transition-colors"><i data-lucide="users" class="w-5 h-5"></i></a>
-                        <a href="#" class="text-gray-500 hover:text-bolivar-gold transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
-                        <a href="#" class="text-gray-500 hover:text-bolivar-gold transition-colors"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                        <!-- CHANGED: New Twitter Link and Icon -->
+                        <a href="https://x.com/LWHonSolana" target="_blank" class="text-gray-500 hover:text-bolivar-gold transition-colors hover:scale-110 transform duration-200"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                        <a href="#" class="text-gray-500 hover:text-bolivar-gold transition-colors hover:scale-110 transform duration-200"><i data-lucide="instagram" class="w-5 h-5"></i></a>
                     </div>
                 </div>
             </div>
@@ -463,8 +540,9 @@
                 <p class="text-xs text-gray-600 font-sans tracking-widest">
                     &copy; 2024 HISTORICAL MEMORY PROJECT. ALL RIGHTS RESERVED.
                 </p>
+                <!-- CHANGED: $VWH -> $LWH -->
                 <p class="text-[10px] text-gray-700 mt-2">
-                    $VWH IS A MEMECOIN FOR ENTERTAINMENT PURPOSES. NOT FINANCIAL ADVICE.
+                    $LWH IS A MEMECOIN FOR ENTERTAINMENT PURPOSES. NOT FINANCIAL ADVICE.
                 </p>
             </div>
         </div>
@@ -475,8 +553,8 @@
         // Initialize Icons
         lucide.createIcons();
 
-        // Advanced Reveal on Scroll
-        const revealElements = document.querySelectorAll('.reveal');
+        // 3D SCROLL REVEAL LOGIC
+        const revealElements = document.querySelectorAll('.reveal-3d');
 
         const revealOnScroll = () => {
             const windowHeight = window.innerHeight;
@@ -506,6 +584,28 @@
             }
         });
 
+        // HERO TILT EFFECT (MOUSE MOVEMENT)
+        function handleHeroTilt(e) {
+            const content = document.getElementById('hero-content');
+            
+            // Get mouse position relative to center
+            const x = e.clientX / window.innerWidth - 0.5;
+            const y = e.clientY / window.innerHeight - 0.5;
+            
+            // Apply gentle tilt transform
+            content.style.transform = `
+                perspective(1000px)
+                rotateY(${x * 10}deg)
+                rotateX(${-y * 10}deg)
+                translateZ(10px)
+            `;
+        }
+
+        // Reset tilt when mouse leaves
+        document.getElementById('home').addEventListener('mouseleave', () => {
+            document.getElementById('hero-content').style.transform = 'perspective(1000px) rotateY(0) rotateX(0) translateZ(0)';
+        });
+
         // Copy to Clipboard Logic
         function copyToClipboard() {
             const caText = document.getElementById('ca-text').innerText.trim();
@@ -529,6 +629,67 @@
                 console.error('Failed to copy: ', err);
             });
         }
+
+        /* --- PARTICLE ANIMATION SCRIPT --- */
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray;
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.1; // Small dust-like particles
+                this.speedX = Math.random() * 0.5 - 0.25; // Slow drift
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = 'rgba(212, 175, 55, ' + (Math.random() * 0.5 + 0.1) + ')'; // Gold tint
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Reset if out of bounds
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.width * canvas.height) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
     </script>
 </body>
 </html>
